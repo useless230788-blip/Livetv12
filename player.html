@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="referrer" content="no-referrer" />
+  <title>StreamVerse · Live Player</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-user-select:none; }
+    html, body { background:#000; width:100%; height:100%; overflow:hidden; font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+
+    /* ── TOP NAV ── */
+    .top-bar {
+      position:absolute; top:0; left:0; right:0; z-index:20;
+      background:linear-gradient(to bottom,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.6) 70%,transparent 100%);
+      padding:14px 20px 28px;
+      display:flex; align-items:center; justify-content:space-between;
+      pointer-events:none;
+    }
+    .top-bar-left { display:flex; align-items:center; gap:10px; pointer-events:all; }
+    .back-btn {
+      background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+      color:white; border-radius:5px; width:34px; height:34px;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; text-decoration:none; font-size:0.85rem; transition:0.2s;
+    }
+    .back-btn:hover { background:rgba(255,255,255,0.22); }
+    .brand-badge {
+      background:#E50914; color:white; font-size:0.72rem; font-weight:900;
+      padding:3px 8px; border-radius:3px; letter-spacing:0.3px;
+    }
+    .brand-name { color:white; font-weight:800; font-size:0.95rem; }
+    .ch-info { pointer-events:none; text-align:right; }
+    .ch-name { color:white; font-weight:700; font-size:0.95rem; text-shadow:0 2px 8px rgba(0,0,0,0.8); }
+    .live-tag {
+      display:inline-flex; align-items:center; gap:4px;
+      background:#E50914; color:white; font-size:0.58rem; font-weight:800;
+      padding:2px 6px; border-radius:2px; letter-spacing:1px; margin-top:3px;
+    }
+    .live-dot { width:5px; height:5px; border-radius:50%; background:white; animation:blink 1.2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ── BOTTOM BAR ── */
+    .bottom-bar {
+      position:absolute; bottom:0; left:0; right:0; z-index:20;
+      background:linear-gradient(to top,rgba(0,0,0,0.92) 0%,transparent 100%);
+      padding:20px 20px 14px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .switch-btns { display:flex; gap:8px; }
+    .switch-btn {
+      background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.2);
+      color:#bbb; border-radius:4px; padding:7px 16px;
+      font-size:0.78rem; cursor:pointer; font-weight:700;
+      transition:0.2s; display:flex; align-items:center; gap:5px;
+      font-family:'Inter',sans-serif;
+    }
+    .switch-btn:hover { border-color:rgba(255,255,255,0.5); color:white; }
+    .switch-btn.active { background:#E50914; color:white; border-color:#E50914; }
+    .dev-credits { font-size:0.65rem; color:rgba(255,255,255,0.4); text-align:right; line-height:1.6; }
+    .dev-credits strong { color:rgba(255,255,255,0.7); display:block; font-size:0.7rem; }
+
+    /* ── PLAYER ── */
+    #playerContainer { position:relative; width:100%; max-width:900px; margin:auto; background:#000; height:100vh; display:flex; align-items:center; justify-content:center; }
+    #playerInner { position:relative; width:100%; padding-bottom:56.25%; background:#000; }
+    #playerInner > * { position:absolute; top:0; left:0; width:100%; height:100%; }
+    .loading-msg { color:#aaa; text-align:center; padding-top:25vh; font-size:1rem; }
+    .loading-msg .spinner { width:34px; height:34px; border:3px solid rgba(255,255,255,0.08); border-top-color:#E50914; border-radius:50%; margin:0 auto 1rem; animation:spin 0.8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ── TIP POPUP ── */
+    .tip-overlay {
+      position:fixed; inset:0; z-index:9999;
+      background:rgba(0,0,0,0.88);
+      display:flex; align-items:center; justify-content:center; padding:1rem;
+      animation:fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    .tip-box {
+      background:#1a1a1a; border:1px solid rgba(229,9,20,0.35);
+      border-radius:12px; max-width:360px; width:100%;
+      padding:1.8rem 1.6rem;
+      box-shadow:0 20px 60px rgba(0,0,0,0.9);
+      animation:slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+    .tip-icon {
+      width:52px; height:52px;
+      background:rgba(229,9,20,0.1); border:1.5px solid rgba(229,9,20,0.3);
+      border-radius:50%; display:flex; align-items:center; justify-content:center;
+      margin:0 auto 1rem; font-size:1.4rem;
+    }
+    .tip-title { font-size:1rem; font-weight:800; color:white; text-align:center; margin-bottom:0.8rem; }
+    .tip-body { font-size:0.82rem; color:#aaa; text-align:center; line-height:1.7; margin-bottom:1.4rem; }
+    .tip-body strong { color:#E50914; }
+    .tip-step {
+      background:rgba(255,255,255,0.04); border-radius:6px;
+      padding:0.6rem 0.8rem; margin-top:0.7rem;
+      text-align:left; border-left:3px solid #E50914;
+      font-size:0.79rem; color:#ccc;
+    }
+    .tip-ok {
+      width:100%; background:#E50914; color:white; border:none;
+      border-radius:6px; padding:0.75rem; font-size:0.9rem;
+      font-weight:700; cursor:pointer; transition:0.2s;
+      font-family:'Inter',sans-serif; letter-spacing:0.3px;
+    }
+    .tip-ok:hover { background:#c40812; }
+  </style>
+</head>
+<body>
+
+  <!-- ── TIP POPUP ── -->
+  <div class="tip-overlay" id="tipOverlay">
+    <div class="tip-box">
+      <div class="tip-icon">💡</div>
+      <div class="tip-title">Playback Tip</div>
+      <div class="tip-body">
+        This channel opens with <strong>Shaka Player</strong> for best compatibility.
+        <div class="tip-step">
+          ⚠️ If the video <strong style="color:white;">doesn't play</strong> or shows a black screen — the stream may need a different engine.
+        </div>
+        <div class="tip-step">
+          🔄 Try switching players using the buttons at the <strong style="color:white;">bottom of the screen</strong> anytime.
+        </div>
+      </div>
+      <button class="tip-ok" id="tipOkBtn">▶ Got it, Start Watching</button>
+    </div>
+  </div>
+
+  <!-- ── TOP NAV ── -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <a href="index.html" class="back-btn" title="Back">&#8592;</a>
+      <span class="brand-badge">SV</span>
+      <span class="brand-name">StreamVerse</span>
+    </div>
+    <div class="ch-info">
+      <div class="ch-name" id="channelTitle">Loading...</div>
+      <span class="live-tag"><span class="live-dot"></span> LIVE</span>
+    </div>
+  </div>
+
+  <!-- ── PLAYER ── -->
+  <div id="playerContainer">
+    <div id="playerInner">
+      <div class="loading-msg">
+        <div class="spinner"></div>
+        Waiting to start...
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BOTTOM BAR ── -->
+  <div class="bottom-bar">
+    <div class="switch-btns">
+      <button class="switch-btn active" id="btnShaka">&#9654; Shaka Player</button>
+    </div>
+    <div class="dev-credits">
+      <strong>Deepanshu Yadav</strong>
+      <span>Taught by Shoeb Bro</span>
+    </div>
+  </div>
+
+  <script>
+    // ================== CONFIG ==================
+    const API_URL = 'https://m3u.cloudplay.qzz.io/pllivejtv2.json';   // fallback if sessionStorage missing
+    const KEY_PROXY = 'https://key.testing2mf.workers.dev/?url=';
+
+    // ================== STATE ==================
+    let channelData = null;
+    let streamUrl = null;
+    let streamType = 'dash';
+    let customHeaders = {};
+    let customUA = null;
+    let drmKeys = [];
+
+    const channelTitle = document.getElementById('channelTitle');
+    const playerInner = document.getElementById('playerInner');
+
+    // ================== UTILS ==================
+    function base64urlToHex(str) {
+      // Convert base64url → standard base64
+      let b64 = str.replace(/-/g, '+').replace(/_/g, '/');
+      while (b64.length % 4) b64 += '=';
+      const raw = atob(b64);
+      let hex = '';
+      for (let i = 0; i < raw.length; i++) {
+        const h = raw.charCodeAt(i).toString(16);
+        hex += h.length === 1 ? '0' + h : h;
+      }
+      return hex;
+    }
+
+    function setLoading(msg) {
+      playerInner.innerHTML = `<div class="loading-msg">${msg}</div>`;
+    }
+    function showError(msg) {
+      setLoading('<span style="color:#ff4d4d;">❌ ' + msg + '</span>');
+    }
+
+    // ================== DRM KEY FETCH (with 5s timeout) ==================
+    async function fetchKeys(licenseUrl) {
+      if (!licenseUrl) return [];
+      const proxyUrl = KEY_PROXY + encodeURIComponent(licenseUrl) + '&userAgent=Mozilla/5.0';
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      try {
+        const res = await fetch(proxyUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        if (!data.keys || !Array.isArray(data.keys)) return [];
+        return data.keys.map(k => ({ kid: k.kid, k: k.k }));
+      } catch (e) {
+        clearTimeout(timeoutId);
+        console.warn('Key fetch failed/timeout:', e.message);
+        return [];
+      }
+    }
+
+    // ================== ADAPT CHANNEL OBJECT ==================
+    function adaptChannel(raw) {
+      if (raw.type === 'hls' || raw.m3u8_url) {
+        streamUrl = raw.m3u8_url;
+        streamType = 'hls';
+      } else {
+        streamUrl = raw.mpd_url || raw.m3u8_url;
+        streamType = raw.type === 'hls' ? 'hls' : 'dash';
+      }
+      customHeaders = {};
+      if (raw.headers) {
+        if (raw.headers.cookie) customHeaders.cookie = raw.headers.cookie;
+        if (raw.headers.Origin) customHeaders.Origin = raw.headers.Origin;
+        if (raw.headers.Referer) customHeaders.Referer = raw.headers.Referer;
+      }
+      customUA = raw.user_agent || 'plaYtv/7.1.3 (Linux;Android 13) ExoPlayerLib/824.0';
+      drmKeys = [];
+    }
+
+    // ================== PLAYBACK ==================
+    async function startPlayback() {
+      if (!streamUrl) {
+        showError('No stream URL found');
+        return;
+      }
+
+      // Fetch DRM keys if channel has license_url (will timeout after 5s)
+      if (channelData && channelData.license_url) {
+        setLoading('🔑 Fetching license keys...');
+        drmKeys = await fetchKeys(channelData.license_url);
+        console.log('DRM keys loaded:', drmKeys.length);
+      }
+
+      setLoading('🎬 Starting stream...');
+      setupShakaPlayer();
+    }
+
+    function updateTitle() {
+      document.title = (channelData ? channelData.name : 'Channel') + ' · LIVE – StreamVerse';
+      const el = document.getElementById('channelTitle'); if(el) el.textContent = channelData ? channelData.name : 'StreamVerse Live';
+    }
+
+    // ================== SHAKA PLAYER SETUP ==================
+    function setupShakaPlayer() {
+      playerInner.innerHTML = '';
+      const videoEl = document.createElement('video');
+      videoEl.autoplay = true;
+      videoEl.playsInline = true;
+      videoEl.style.width = '100%';
+      videoEl.style.height = '100%';
+      videoEl.style.objectFit = 'fill';
+      playerInner.appendChild(videoEl);
+
+      if (typeof shaka === 'undefined') { showError('Shaka not loaded'); return; }
+      shaka.polyfill.installAll();
+      if (!shaka.Player.isBrowserSupported()) { showError('Shaka not supported'); return; }
+
+      const player = new shaka.Player();
+      player.attach(videoEl).then(() => {
+        const ui = new shaka.ui.Overlay(player, playerInner, videoEl);
+        ui.configure({ controlPanelElements: ['play_pause', 'time_and_duration', 'mute', 'volume', 'fullscreen'] });
+
+        // ClearKey DRM (hex format)
+        if (drmKeys.length > 0) {
+          const keys = {};
+          drmKeys.forEach(k => { keys[base64urlToHex(k.kid)] = base64urlToHex(k.k); });
+          player.configure({ drm: { clearKeys: keys } });
+        }
+        player.configure({ streaming: { lowLatencyMode: true } });
+
+        // Inject headers & cookie via network filter
+        player.getNetworkingEngine().registerRequestFilter((type, request) => {
+          if (customUA) request.headers['User-Agent'] = customUA;
+          if (customHeaders.Origin) request.headers['Origin'] = customHeaders.Origin;
+          if (customHeaders.Referer) request.headers['Referer'] = customHeaders.Referer;
+          if (customHeaders.cookie &&
+              (type === shaka.net.NetworkingEngine.RequestType.MANIFEST ||
+               type === shaka.net.NetworkingEngine.RequestType.SEGMENT)) {
+            for (let i = 0; i < request.uris.length; i++) {
+              const uri = request.uris[i];
+              if (!uri.includes('__hdnea__')) {
+                const sep = uri.includes('?') ? '&' : '?';
+                request.uris[i] = uri + sep + customHeaders.cookie;
+              }
+            }
+          }
+        });
+
+        return player.load(streamUrl);
+      }).then(() => {
+        videoEl.play().catch(() => {}); // autoplay may be blocked, user can tap
+        updateTitle();
+        console.log('Playback started');
+      }).catch(error => {
+        console.error('Shaka error:', error);
+        showError('Stream playback failed');
+      });
+    }
+
+    // ================== INIT ==================
+    async function initPlayer() {
+      let raw = null;
+      // 1. From sessionStorage (set by main page)
+      const stored = sessionStorage.getItem('shoeb_player_data');
+      if (stored) {
+        try {
+          raw = JSON.parse(stored);
+          sessionStorage.removeItem('shoeb_player_data');
+          console.log('Loaded from sessionStorage:', raw.name);
+        } catch(e) {}
+      }
+
+      // 2. Fallback: fetch from API using ?id= parameter
+      if (!raw) {
+        const params = new URLSearchParams(location.search);
+        const id = params.get('id');
+        if (!id) { showError('No channel ID'); return; }
+        setLoading('Fetching channel list...');
+        try {
+          const res = await fetch(API_URL);
+          if (!res.ok) throw new Error('Worker ' + res.status);
+          const channels = await res.json();
+          const usable = channels.slice(1); // skip promo item
+          raw = usable.find(c => c.name.toLowerCase() === id.toLowerCase());
+          if (!raw) { showError('Channel not found'); return; }
+        } catch(err) {
+          showError('Failed to load: ' + err.message);
+          return;
+        }
+      }
+
+      channelData = raw;
+      adaptChannel(raw);
+      await startPlayback();
+    }
+
+    // ── TIP POPUP: wait for user before loading ──
+    const tipOverlay = document.getElementById('tipOverlay');
+    const tipOkBtn = document.getElementById('tipOkBtn');
+    if (tipOkBtn) {
+      tipOkBtn.addEventListener('click', function() {
+        tipOverlay.style.opacity = '0';
+        tipOverlay.style.transition = 'opacity 0.2s';
+        setTimeout(function() {
+          tipOverlay.style.display = 'none';
+          initPlayer();
+        }, 200);
+      });
+    } else {
+      initPlayer();
+    }
+  </script>
+</body>
+</html>
