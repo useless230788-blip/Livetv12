@@ -1,193 +1,249 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>JioTV Plus Web</title>
-    <!-- Favicon & Logo -->
-    <link rel="icon" type="image/jpeg" href="https://i.ibb.co/PvknKR5R/07e1dc7f1e03.jpg">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        :root {
-            --c1: #ff1ad9; --c2: #ff4da6; --c3: #00e0ff;
-            --bg: #03000d; --card-bg: #0d0a1f;
-            --glass: rgba(18,16,45,0.7); --border: rgba(255,26,217,0.3);
-            --text: #f0e6ff; --muted: #9d8abf; --radius: 24px;
-        }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            background: var(--bg); color: var(--text);
-            font-family: 'Inter', system-ui, sans-serif;
-            min-height: 100vh; padding: 1rem;
-            user-select: none; -webkit-user-select: none;
-        }
-        .app { max-width: 1600px; margin:0 auto; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.5,user-scalable=yes"/>
+<meta name="theme-color" content="#141414"/>
+<title>JioTV Plus Web — Live TV</title>
+<link rel="icon" type="image/jpeg" href="https://i.ibb.co/PvknKR5R/07e1dc7f1e03.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+:root{
+  --red:#E50914;--red-dark:#B20710;
+  --bg:#141414;--bg2:#0d0d0d;
+  --surface:#1f1f1f;--surface2:#2a2a2a;
+  --line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.13);
+  --white:#fff;--off-white:#e5e5e5;--muted:#999;--muted2:#666;
+  --green:#46d369;--r:6px;--r-lg:10px;
+  --font:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;font-family:var(--font);background:var(--bg);color:var(--white);overflow-x:hidden;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none}
+::selection{background:var(--red);color:#fff}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shimmer{to{background-position:-200% 0}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-        .header {
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;
-        }
-        .logo { display: flex; align-items: center; gap: 0.5rem; }
-        .logo img {
-            height: 2.4rem; width: auto; border-radius: 8px;
-            box-shadow: 0 0 10px rgba(255,26,217,0.4);
-        }
-        .logo h1 {
-            font-size: 1.7rem; font-weight: 800;
-            background: linear-gradient(135deg, var(--c1), var(--c3));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .header-right {
-            display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap;
-        }
-        .search-box {
-            background: var(--glass); border: 1px solid var(--border);
-            border-radius: 50px; padding: 0.4rem 1.2rem;
-            display: flex; align-items: center; gap: 0.4rem;
-            backdrop-filter: blur(10px);
-        }
-        .search-box i { color: var(--muted); }
-        .search-box input {
-            background: transparent; border: none; outline: none;
-            color: white; font-size: 0.9rem; width: 180px;
-        }
-        .search-box input::placeholder { color: #5e668a; }
-        .icon-btn {
-            background: var(--glass); border: 1px solid var(--border);
-            border-radius: 50%; width: 40px; height: 40px; display: flex;
-            align-items: center; justify-content: center; color: var(--muted);
-            cursor: pointer; transition: 0.2s; backdrop-filter: blur(10px);
-            position: relative;
-        }
-        .icon-btn:hover { color: white; border-color: var(--c1); }
-        .bookmark-badge {
-            position: absolute; top: -6px; right: -6px;
-            background: #e12d4a; color: white; font-size: 0.65rem;
-            width: 20px; height: 20px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700;
-        }
-        .telegram-btn {
-            background: linear-gradient(135deg, #00b0ff, #0088cc);
-            color: white; border: none; border-radius: 50px;
-            padding: 0.5rem 1.2rem; font-weight: 700; text-decoration: none;
-            display: flex; align-items: center; gap: 0.4rem;
-            font-size: 0.85rem; box-shadow: 0 0 15px rgba(0,176,255,0.5);
-            transition: 0.2s;
-        }
-        .telegram-btn:hover { transform: scale(1.03); box-shadow: 0 0 25px rgba(0,176,255,0.8); }
+/* ── HEADER ── */
+.header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(20,20,20,.97);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.85rem clamp(14px,4vw,48px);gap:1rem;flex-wrap:wrap;
+}
+.logo{display:flex;align-items:center;gap:.7rem;text-decoration:none}
+.logo img{height:2.2rem;width:auto;border-radius:6px}
+.logo h1{font-size:clamp(1.1rem,3vw,1.45rem);font-weight:900;color:var(--red);letter-spacing:-.04em;line-height:1}
+.logo .sub{font-size:.6rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:1px}
+.header-right{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+.dev-info{text-align:right;line-height:1.45}
+.dev-info .dn{font-size:.72rem;font-weight:700;color:var(--off-white)}
+.dev-info .dt{font-size:.6rem;color:var(--muted)}
+.search-box{
+  background:rgba(255,255,255,.08);border:1px solid var(--line2);
+  border-radius:4px;padding:.4rem .9rem;
+  display:flex;align-items:center;gap:.4rem;transition:.2s;
+}
+.search-box:focus-within{border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.12)}
+.search-box i{color:#aaa;font-size:.8rem}
+.search-box input{background:transparent;border:none;outline:none;color:#fff;font-size:.88rem;width:180px;font-family:var(--font)}
+.search-box input::placeholder{color:var(--muted2)}
+.icon-btn{
+  background:transparent;border:1.5px solid var(--line2);
+  border-radius:4px;width:38px;height:38px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted);cursor:pointer;transition:.2s;position:relative;
+}
+.icon-btn:hover{color:#fff;border-color:#fff}
+.bookmark-badge{
+  position:absolute;top:-7px;right:-7px;
+  background:var(--red);color:#fff;font-size:.58rem;
+  width:17px;height:17px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;border:1.5px solid var(--bg);
+}
 
-        .cat-shell {
-            background: var(--glass); border: 1px solid var(--border);
-            border-radius: 40px; padding: 0.7rem 1rem; margin-bottom: 1.5rem;
-            backdrop-filter: blur(12px);
-        }
-        .cats { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
-        .cat-chip {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            color: var(--muted); border-radius: 40px; padding: 0.4rem 1rem;
-            font-size: 0.8rem; cursor: pointer; font-weight: 500; transition: 0.2s;
-        }
-        .cat-chip:hover { background: rgba(255,255,255,0.1); color: white; }
-        .cat-chip.active {
-            background: var(--c1); color: white; border-color: var(--c1);
-            box-shadow: 0 0 12px var(--c1);
-        }
-        .toggle-cat {
-            background: transparent; border: 1px solid var(--border); color: var(--muted);
-            border-radius: 40px; padding: 0.4rem 1rem; font-size: 0.8rem;
-            cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem;
-        }
-        .toggle-cat:hover { color: white; border-color: var(--c1); }
+/* ── CREDITS STRIP ── */
+.credits-strip{
+  background:linear-gradient(135deg,rgba(229,9,20,.08),rgba(0,0,0,.6));
+  border-bottom:1px solid rgba(229,9,20,.15);
+  padding:8px clamp(14px,4vw,48px);
+  display:flex;align-items:center;justify-content:center;gap:clamp(16px,4vw,48px);flex-wrap:wrap;
+}
+.credit-pill{display:flex;align-items:center;gap:7px;font-size:.75rem;color:var(--muted)}
+.credit-pill i{color:var(--red);font-size:.72rem}
+.credit-pill strong{color:var(--white);font-weight:700}
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
-            gap: 1rem;
-        }
-        .card {
-            background: var(--card-bg); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 1rem 0.5rem 0.8rem;
-            display: flex; flex-direction: column; align-items: center;
-            position: relative; cursor: pointer; transition: 0.3s;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-            animation: fadeUp 0.4s ease;
-        }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .card:hover {
-            transform: translateY(-5px); border-color: var(--c1);
-            box-shadow: 0 12px 30px rgba(255,26,217,0.2);
-        }
-        .card-logo {
-            width: 80px; height: 80px; border-radius: 20px;
-            background: rgba(255,255,255,0.05); display: flex;
-            align-items: center; justify-content: center; margin-bottom: 0.6rem;
-            overflow: hidden;
-        }
-        .card-logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .card-name {
-            font-weight: 600; font-size: 0.85rem; text-align: center;
-            color: var(--text); word-break: break-word; line-height: 1.2;
-        }
-        .card-badge {
-            margin-top: 4px; display: flex; gap: 4px; flex-wrap: wrap; justify-content: center;
-        }
-        .hd-badge {
-            background: #e12d4a; color: white; font-size: 0.6rem; font-weight: 800;
-            padding: 2px 6px; border-radius: 30px; letter-spacing: 0.5px;
-        }
-        .cat-mini {
-            background: rgba(255,255,255,0.1); color: #b8c4ff;
-            font-size: 0.6rem; padding: 2px 6px; border-radius: 30px;
-        }
-        .bookmark-icon {
-            position: absolute; top: 8px; right: 10px; color: #8e9ad4;
-            font-size: 0.9rem; cursor: pointer; z-index: 5;
-        }
-        .bookmark-icon.active { color: #fbbf24; }
+/* ── CATEGORY RAIL ── */
+.cat-bar{
+  padding:.9rem clamp(14px,4vw,48px) 0;
+  position:sticky;top:57px;z-index:90;
+  background:rgba(20,20,20,.96);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.cats{display:flex;gap:.45rem;overflow-x:auto;padding-bottom:.8rem;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cat-chip{
+  flex:0 0 auto;background:rgba(255,255,255,.07);border:1px solid var(--line2);
+  color:#ccc;border-radius:4px;padding:.4rem 1rem;
+  font-size:.78rem;cursor:pointer;font-weight:600;transition:.15s;white-space:nowrap;
+  font-family:var(--font);
+}
+.cat-chip:hover{background:rgba(255,255,255,.14);color:#fff}
+.cat-chip.active{background:var(--red);color:#fff;border-color:var(--red)}
 
-        .empty { grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--muted); }
+/* ── CONTENT ── */
+.content-wrap{max-width:1600px;margin:0 auto;padding:0 0 120px}
 
-        @media (max-width: 480px) {
-            .header { flex-direction: column; align-items: stretch; }
-            .header-right { justify-content: flex-end; }
-            .search-box input { width: 130px; }
-        }
-    </style>
+/* ── SECTION ROWS ── */
+.section{padding:24px 0 0}
+.sec-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 clamp(14px,4vw,48px);margin-bottom:12px;
+}
+.sec-title{
+  display:flex;align-items:center;gap:9px;
+  font-size:clamp(14px,2.5vw,19px);font-weight:800;letter-spacing:-.025em;
+}
+.sec-icon{
+  width:26px;height:26px;border-radius:6px;
+  background:rgba(229,9,20,.12);border:1px solid rgba(229,9,20,.2);
+  display:grid;place-items:center;flex-shrink:0;color:var(--red);font-size:.72rem;
+}
+.sec-count{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:3px 8px}
+
+/* ── ROW scroll ── */
+.row{display:flex;gap:10px;overflow-x:auto;padding:2px clamp(14px,4vw,48px) 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.row::-webkit-scrollbar{display:none}
+
+/* ── GRID (single cat / search) ── */
+.grid-wrap{padding:0 clamp(14px,4vw,48px)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
+
+/* ── CARD ── */
+.card{
+  position:relative;border-radius:var(--r-lg);overflow:hidden;
+  background:var(--surface);border:1px solid var(--line);
+  cursor:pointer;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+  will-change:transform;animation:fadeUp .3s ease;
+  flex:0 0 clamp(140px,36vw,168px);
+}
+.grid .card{flex:unset}
+@media(hover:hover){.card:hover{transform:translateY(-6px) scale(1.03);box-shadow:0 16px 48px rgba(0,0,0,.7);border-color:rgba(255,255,255,.2);z-index:5}}
+.card:active{transform:scale(.95)}
+
+.card-art{
+  aspect-ratio:1.3/1;display:grid;place-items:center;
+  position:relative;background:linear-gradient(160deg,#1a0a0a,#0d0d0d);overflow:hidden;
+}
+.card-art img{width:56%;height:56%;object-fit:contain;transition:transform .28s ease;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5))}
+@media(hover:hover){.card:hover .card-art img{transform:scale(1.1)}}
+.card-art::after{content:"";position:absolute;inset:auto 0 0;height:40%;background:linear-gradient(to bottom,transparent,rgba(0,0,0,.8))}
+.card-ovl{position:absolute;inset:0;background:rgba(0,0,0,.55);display:grid;place-items:center;opacity:0;transition:.2s}
+@media(hover:hover){.card:hover .card-ovl{opacity:1}}
+.play-btn{width:40px;height:40px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;box-shadow:0 4px 20px rgba(229,9,20,.4)}
+
+.live-badge{position:absolute;top:7px;left:8px;display:flex;align-items:center;gap:4px;font-size:9px;font-weight:800;letter-spacing:.6px;color:#fff;background:var(--red);border-radius:3px;padding:3px 6px;z-index:3}
+.live-badge i{width:5px;height:5px;border-radius:50%;background:#fff;animation:pulse 1.4s infinite}
+.hd-badge{position:absolute;top:7px;right:8px;font-size:9px;font-weight:800;color:#fff;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.2);border-radius:3px;padding:3px 6px;z-index:3;letter-spacing:.5px}
+.cat-badge{position:absolute;bottom:26px;left:8px;font-size:8px;font-weight:700;color:rgba(255,255,255,.65);z-index:3}
+
+.card-info{padding:9px 10px 11px;border-top:1px solid var(--line)}
+.card-name{font-size:.8rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
+.card-meta{font-size:9.5px;color:var(--muted);font-weight:600;margin-top:3px;text-transform:capitalize}
+
+.bookmark-icon{position:absolute;top:6px;right:30px;color:rgba(255,255,255,.6);font-size:.82rem;cursor:pointer;z-index:10;transition:.2s;text-shadow:0 0 6px rgba(0,0,0,.9)}
+.bookmark-icon:hover{color:#fff;transform:scale(1.2)}
+.bookmark-icon.active{color:#fbbf24}
+
+/* ── SKELETON ── */
+.sk-card{border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line);background:var(--surface)}
+.sk-art{aspect-ratio:1.3/1;background:linear-gradient(100deg,#1a1a1a 30%,#242424 50%,#1a1a1a 70%);background-size:200%;animation:shimmer 1.5s linear infinite}
+.sk-line{height:10px;margin:10px 11px;border-radius:4px;background:linear-gradient(100deg,#1a1a1a 30%,#242424 50%,#1a1a1a 70%);background-size:200%;animation:shimmer 1.5s linear infinite}
+.sk-line.s{width:55%;margin-top:0}
+
+/* ── EMPTY ── */
+.empty{padding:48px 24px;text-align:center;color:var(--muted);border:1px dashed var(--line2);border-radius:12px;background:var(--surface);margin:0 clamp(14px,4vw,48px)}
+
+/* ── FOOTER ── */
+.footer{background:var(--bg2);border-top:1px solid var(--line);padding:2.5rem clamp(14px,4vw,48px);margin-top:2rem;text-align:center}
+.footer-logo{font-size:1.5rem;font-weight:900;color:var(--red);letter-spacing:-.04em;margin-bottom:4px}
+.footer-sub{color:var(--muted2);font-size:.75rem;margin-bottom:1.2rem}
+.footer-card{display:inline-block;background:var(--surface);border:1px solid rgba(229,9,20,.2);border-radius:10px;padding:14px 24px;margin-bottom:1.2rem}
+.footer-card .lbl{font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
+.footer-card .fname{font-size:16px;font-weight:800;color:#fff;letter-spacing:-.02em}
+.footer-card .fmeta{font-size:11px;color:var(--muted);margin-top:5px}
+.footer-card .fmeta strong{color:var(--red)}
+.footer-copy{font-size:.68rem;color:var(--muted2)}
+
+@media(max-width:480px){
+  .header{padding:.7rem 1rem;flex-direction:column;align-items:stretch}
+  .header-right{justify-content:space-between}
+  .search-box input{width:130px}
+  .dev-info{display:none}
+  .cat-bar{top:52px}
+}
+</style>
 </head>
 <body>
-<div class="app">
-    <div class="header">
-        <div class="logo">
-            <!-- Replace bolt icon with the provided logo image -->
-            <img src="https://i.ibb.co/PvknKR5R/07e1dc7f1e03.jpg" alt="JioTV Plus Web logo">
-            <h1>JioTV Plus Web</h1>
-        </div>
-        <div class="header-right">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search channels...">
-            </div>
-            <div class="icon-btn" id="bookmarkBtn">
-                <i class="fas fa-bookmark"></i>
-                <span class="bookmark-badge" id="bookmarkCount">0</span>
-            </div>
-            <a href="https://t.me/teamsterniters" target="_blank" class="telegram-btn">
-                <i class="fab fa-telegram"></i> Join Now
-            </a>
-        </div>
-    </div>
 
-    <div class="cat-shell">
-        <div class="cats" id="categories"></div>
-        <button class="toggle-cat" id="toggleCat"><i class="fas fa-layer-group"></i> <span id="toggleText">Expand</span></button>
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">
+    <img src="https://i.ibb.co/PvknKR5R/07e1dc7f1e03.jpg" alt="logo">
+    <div>
+      <h1>JioTV Plus Web</h1>
+      <div class="sub">Live TV</div>
     </div>
+  </div>
+  <div class="header-right">
+    <div class="dev-info">
+      <div class="dn">Deepanshu Yadav</div>
+      <div class="dt">Taught by Shoeb Bro</div>
+    </div>
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Search channels...">
+    </div>
+    <div class="icon-btn" id="bookmarkBtn" title="My List">
+      <i class="fas fa-bookmark"></i>
+      <span class="bookmark-badge" id="bookmarkCount">0</span>
+    </div>
+  </div>
+</header>
 
-    <div class="grid" id="channelGrid"></div>
+<!-- CREDITS STRIP -->
+<div class="credits-strip">
+  <div class="credit-pill"><i class="fas fa-code"></i> Developed &amp; Designed by <strong>Deepanshu Yadav</strong></div>
+  <div class="credit-pill"><i class="fas fa-graduation-cap"></i> Taught by <strong>Shoeb Bro</strong></div>
+</div>
+
+<!-- CATEGORY CHIPS -->
+<div class="cat-bar">
+  <div class="cats" id="categories"></div>
+</div>
+
+<!-- CONTENT -->
+<div class="content-wrap">
+  <div id="mainContent"></div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-logo">JioTV Plus Web</div>
+    <div class="footer-sub">Live TV · Premium Streams · Free</div>
+    <div class="footer-card">
+      <div class="lbl">Built with ❤️ by</div>
+      <div class="fname">Deepanshu Yadav</div>
+      <div class="fmeta">Developed &amp; Designed by Deepanshu Yadav</div>
+      <div class="fmeta">Taught by <strong>Shoeb Bro</strong></div>
+    </div>
+    <div class="footer-copy">© 2025 JioTV Plus Web. For personal use only.</div>
+  </footer>
 </div>
 
 <script>
@@ -196,17 +252,14 @@
     let channels = [], filtered = [];
     let bookmarks = JSON.parse(localStorage.getItem('sterniters_bm') || '[]');
     let activeCat = 'All';
-    let catsExpanded = false;
     let showBookmarks = false;
     let securityEnabled = false;
 
-    const grid = document.getElementById('channelGrid');
-    const catDiv = document.getElementById('categories');
-    const search = document.getElementById('searchInput');
-    const toggleBtn = document.getElementById('toggleCat');
-    const toggleText = document.getElementById('toggleText');
+    const catDiv      = document.getElementById('categories');
+    const search      = document.getElementById('searchInput');
     const bookmarkBtn = document.getElementById('bookmarkBtn');
     const bookmarkCount = document.getElementById('bookmarkCount');
+    const mainContent = document.getElementById('mainContent');
 
     function updateBookmarkCount() { bookmarkCount.textContent = bookmarks.length; }
 
@@ -222,7 +275,6 @@
     }
 
     function normalizeChannels(data) {
-        // The new API can return a bare array, or { channels: [...] }.
         const list = Array.isArray(data) ? data : (Array.isArray(data?.channels) ? data.channels : []);
         return list.map((ch, index) => ({
             ...ch,
@@ -233,119 +285,148 @@
             keyId: ch.keyId || ch.kid || '',
             key: ch.key || '',
             cookie: ch.cookie || '',
-            // This API doesn't reliably supply a clean category string, so derive one from the name
-            // when it's missing — same fallback the source app used.
             category: ch.category?.trim() || categoryFromName(ch.name || ch.title)
         })).filter(ch => ch.mpd);
     }
 
-    async function loadChannels() {
-        try {
-            const res = await fetch(API);
-            const data = await res.json();
-            channels = normalizeChannels(data);
-            if (!channels.length) throw new Error('No playable channels returned');
-            updateBookmarkCount();
-            renderCategories();
-            filterAndRender();
-            setTimeout(enableSecurity, 2000);
-        } catch(e) {
-            grid.innerHTML = '<div class="empty">⚠️ Could not load channels.</div>';
-        }
+    /* ── skeleton ── */
+    function skeleton() {
+        let h='';for(let i=0;i<12;i++)h+=`<div class="sk-card"><div class="sk-art"></div><div class="sk-line"></div><div class="sk-line s"></div></div>`;
+        return `<div class="section"><div class="grid-wrap"><div class="grid">${h}</div></div></div>`;
     }
 
+    /* ── categories ── */
     function extractCategories() {
         const set = new Set();
         channels.forEach(c => { if (c.category) set.add(c.category.trim()); });
         return ['All', ...Array.from(set).sort()];
     }
 
-    function renderCategories() {
+    function renderCategoryChips() {
         const allCats = extractCategories();
-        const visible = catsExpanded ? allCats : allCats.slice(0,1);
-        catDiv.innerHTML = visible.map(cat =>
+        catDiv.innerHTML = allCats.map(cat =>
             `<span class="cat-chip ${activeCat === cat ? 'active' : ''}" data-cat="${cat}">${cat}</span>`
         ).join('');
-        document.querySelectorAll('.cat-chip').forEach(chip => {
+        catDiv.querySelectorAll('.cat-chip').forEach(chip => {
             chip.addEventListener('click', () => {
                 activeCat = chip.dataset.cat;
                 showBookmarks = false;
                 bookmarkBtn.classList.remove('active');
-                renderCategories();
-                filterAndRender();
+                renderCategoryChips();
+                renderContent();
             });
         });
-        toggleText.textContent = catsExpanded ? 'Show less' : 'Expand';
     }
 
-    toggleBtn.onclick = () => {
-        catsExpanded = !catsExpanded;
-        renderCategories();
+    /* ── card HTML ── */
+    function ph(){ return 'data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect width="80" height="80" rx="8" fill="%231f1f1f"/><text x="40" y="48" font-family="monospace" font-size="18" fill="%23E50914" text-anchor="middle">TV</text></svg>'); }
+
+    function cardHTML(ch) {
+        const chId = ch.id || ch.name;
+        const bookmarked = bookmarks.includes(chId);
+        const logo = ch.logo || ph();
+        const hasHD = ch.mpd && (ch.mpd.includes('HD') || ch.mpd.includes('1080') || ch.mpd.includes('720'));
+        return `<div class="card" data-id="${chId}" data-name="${ch.name||''}">
+            <span class="bookmark-icon ${bookmarked?'active':''}" data-id="${chId}">
+                <i class="fa${bookmarked?'s':'r'} fa-bookmark"></i>
+            </span>
+            <div class="card-art">
+                <span class="live-badge"><i></i>LIVE</span>
+                ${hasHD?'<span class="hd-badge">HD</span>':''}
+                <span class="cat-badge">${ch.category||''}</span>
+                <img src="${logo}" onerror="this.onerror=null;this.src='${ph()}'" loading="lazy" alt="">
+                <div class="card-ovl"><div class="play-btn"><i class="fas fa-play" style="font-size:.8rem;margin-left:2px"></i></div></div>
+            </div>
+            <div class="card-info">
+                <div class="card-name">${ch.name||''}</div>
+                <div class="card-meta">${hasHD?'HD · ':''}${ch.category||''}</div>
+            </div>
+        </div>`;
+    }
+
+    /* ── section ── */
+    function sectionHTML(title, icon, list, useRow) {
+        const items = list.map(cardHTML).join('');
+        return `<div class="section">
+            <div class="sec-header">
+                <div class="sec-title">
+                    <span class="sec-icon"><i class="fas ${icon}"></i></span>${title}
+                </div>
+                <span class="sec-count">${list.length} channels</span>
+            </div>
+            ${useRow
+                ? `<div class="row">${items}</div>`
+                : `<div class="grid-wrap"><div class="grid">${items}</div></div>`
+            }
+        </div>`;
+    }
+
+    const CAT_ICONS = {
+        'Sports':'fa-futbol','News':'fa-newspaper','Music':'fa-music',
+        'Kids':'fa-child','Devotional':'fa-om','Movies':'fa-film',
+        'Entertainment':'fa-tv','All':'fa-globe'
     };
 
-    function filterAndRender() {
-        let query = search.value.trim().toLowerCase();
-        let temp = [...channels];
+    /* ── main render ── */
+    function renderContent() {
+        const query = search.value.trim().toLowerCase();
+        let list = [...channels];
+
         if (showBookmarks) {
-            temp = temp.filter(c => bookmarks.includes(c.id || c.name));
-        } else if (activeCat !== 'All') {
-            temp = temp.filter(c => c.category === activeCat);
+            list = list.filter(c => bookmarks.includes(c.id || c.name));
+            mainContent.innerHTML = list.length
+                ? sectionHTML('My Bookmarks','fa-bookmark',list,false)
+                : `<div class="empty">📭 No bookmarks yet. Click ⊡ on any channel to save.</div>`;
+            return;
         }
-        if (query) temp = temp.filter(c => c.name?.toLowerCase().includes(query));
-        filtered = temp;
-        renderGrid(temp);
-    }
+        if (query) {
+            list = list.filter(c => c.name?.toLowerCase().includes(query));
+            mainContent.innerHTML = list.length
+                ? sectionHTML(`Results for "${search.value.trim()}"`, 'fa-search', list, false)
+                : `<div class="empty">📭 No channels found</div>`;
+            return;
+        }
+        if (activeCat !== 'All') {
+            list = list.filter(c => c.category?.trim() === activeCat);
+            mainContent.innerHTML = list.length
+                ? sectionHTML(activeCat, CAT_ICONS[activeCat]||'fa-tv', list, false)
+                : `<div class="empty">📭 No channels in this category</div>`;
+            return;
+        }
 
-    function renderGrid(list) {
+        // All → category rows
+        const cats = extractCategories().filter(c => c !== 'All');
         let html = '';
-        list.forEach(ch => {
-            const chId = ch.id || ch.name;
-            const bookmarked = bookmarks.includes(chId);
-            const logo = ch.logo || 'https://via.placeholder.com/80?text=📺';
-            const hasHD = ch.mpd && (ch.mpd.includes('HD') || ch.mpd.includes('1080') || ch.mpd.includes('720'));
-            html += `
-                <div class="card" data-id="${chId}" data-name="${ch.name || ''}">
-                    <span class="bookmark-icon ${bookmarked ? 'active' : ''}" data-id="${chId}"><i class="fa${bookmarked ? 's' : 'r'} fa-bookmark"></i></span>
-                    <div class="card-logo"><img src="${logo}" alt="" loading="lazy"></div>
-                    <div class="card-name">${ch.name || ''}</div>
-                    <div class="card-badge">
-                        ${hasHD ? '<span class="hd-badge">HD</span>' : ''}
-                        ${ch.category ? '<span class="cat-mini">'+ch.category.slice(0,12)+'</span>' : ''}
-                    </div>
-                </div>`;
+        cats.forEach(cat => {
+            const arr = list.filter(c => c.category?.trim() === cat);
+            if (!arr.length) return;
+            html += sectionHTML(cat, CAT_ICONS[cat]||'fa-tv', arr, true);
         });
-        if (list.length === 0) html = '<div class="empty">📭 No channels</div>';
-        grid.innerHTML = html;
-
-        document.querySelectorAll('.bookmark-icon').forEach(icon => {
-            icon.addEventListener('click', e => {
-                e.stopPropagation();
-                const id = icon.dataset.id;
-                const idx = bookmarks.indexOf(id);
-                if (idx > -1) bookmarks.splice(idx,1);
-                else bookmarks.push(id);
-                localStorage.setItem('sterniters_bm', JSON.stringify(bookmarks));
-                updateBookmarkCount();
-                if (showBookmarks) filterAndRender();
-                else {
-                    const cardIcon = icon.querySelector('i');
-                    if (cardIcon) {
-                        cardIcon.className = idx > -1 ? 'far fa-bookmark' : 'fas fa-bookmark';
-                        icon.classList.toggle('active');
-                    }
-                }
-            });
-        });
-
-        document.querySelectorAll('.card').forEach(card => {
-            card.addEventListener('click', e => {
-                if (e.target.closest('.bookmark-icon')) return;
-                const id = card.dataset.id;
-                const channel = channels.find(c => String(c.id) === String(id));
-                if (channel) openPlayer(channel);
-            });
-        });
+        mainContent.innerHTML = html || `<div class="empty">📭 No channels found</div>`;
     }
+
+    /* ── event delegation ── */
+    mainContent.addEventListener('click', e => {
+        const bm = e.target.closest('.bookmark-icon');
+        if (bm) {
+            e.stopPropagation();
+            const id = bm.dataset.id;
+            const idx = bookmarks.indexOf(id);
+            if (idx > -1) bookmarks.splice(idx,1); else bookmarks.push(id);
+            localStorage.setItem('sterniters_bm', JSON.stringify(bookmarks));
+            updateBookmarkCount();
+            bm.querySelector('i').className = bookmarks.includes(id) ? 'fas fa-bookmark' : 'far fa-bookmark';
+            bm.classList.toggle('active', bookmarks.includes(id));
+            if (showBookmarks) renderContent();
+            return;
+        }
+        const card = e.target.closest('.card');
+        if (card) {
+            const id = card.dataset.id;
+            const channel = channels.find(c => String(c.id) === String(id));
+            if (channel) openPlayer(channel);
+        }
+    });
 
     function encodePayload(value) {
         const bytes = new TextEncoder().encode(JSON.stringify(value));
@@ -355,7 +436,6 @@
     }
 
     function openPlayer(channel) {
-        // Some streams carry a signed token inside the cookie string (__hdnea__=...).
         const token = String(channel.cookie || '').match(/__hdnea__=([^;]+)/)?.[1] || '';
         const payload = {
             id: channel.id, name: channel.name, logo: channel.logo,
@@ -366,74 +446,53 @@
     }
 
     bookmarkBtn.addEventListener('click', () => {
-        if (bookmarks.length === 0) {
-            alert('No bookmarks yet! Click the bookmark icon on any channel.');
-            return;
-        }
+        if (bookmarks.length === 0) { alert('No bookmarks yet! Click the bookmark icon on any channel.'); return; }
         showBookmarks = !showBookmarks;
         bookmarkBtn.classList.toggle('active', showBookmarks);
         if (showBookmarks) activeCat = 'All';
-        renderCategories();
-        filterAndRender();
+        renderCategoryChips();
+        renderContent();
     });
 
     let timer;
-    search.addEventListener('input', () => {
-        clearTimeout(timer);
-        timer = setTimeout(filterAndRender, 200);
-    });
+    search.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(renderContent, 200); });
+
+    async function loadChannels() {
+        mainContent.innerHTML = skeleton();
+        try {
+            const res = await fetch(API);
+            const data = await res.json();
+            channels = normalizeChannels(data);
+            if (!channels.length) throw new Error('No playable channels returned');
+            updateBookmarkCount();
+            renderCategoryChips();
+            renderContent();
+            setTimeout(enableSecurity, 2000);
+        } catch(e) {
+            mainContent.innerHTML = `<div class="empty">⚠️ Could not load channels. Check your connection.</div>`;
+        }
+    }
 
     function enableSecurity() {
         if (securityEnabled) return;
         securityEnabled = true;
-        const THRESHOLD = 160;
-        let devtoolsOpen = false;
-        function detectDevTools() {
-            return (window.outerWidth - window.innerWidth > THRESHOLD) ||
-                   (window.outerHeight - window.innerHeight > THRESHOLD);
-        }
-        function destroyPage() {
-            if (devtoolsOpen) return;
-            devtoolsOpen = true;
-            window.fetch = function(){ return Promise.reject(new Error('Blocked')); };
-            XMLHttpRequest.prototype.open = function(){};
-            XMLHttpRequest.prototype.send = function(){};
-            document.documentElement.innerHTML = '';
-            document.body.innerHTML = '<div style="color:red;font-size:24px;text-align:center;margin-top:20vh;">⛔ SECURITY VIOLATION – DevTools forbidden</div>';
-            throw new Error('DevTools detected');
-        }
-        if (detectDevTools()) destroyPage();
-        setInterval(() => { if (!devtoolsOpen && detectDevTools()) destroyPage(); }, 100);
         window.addEventListener('keydown', function(e) {
             if (e.keyCode === 123 ||
                 (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) ||
-                (e.ctrlKey && e.keyCode === 85) ||
-                (e.ctrlKey && e.keyCode === 83) ||
-                (e.ctrlKey && e.keyCode === 80) ||
-                e.key === 'F12' ||
+                (e.ctrlKey && e.keyCode === 85) || (e.ctrlKey && e.keyCode === 83) ||
+                (e.ctrlKey && e.keyCode === 80) || e.key === 'F12' ||
                 (e.ctrlKey && e.shiftKey && e.key === 'I')
-            ) {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            }
+            ) { e.preventDefault(); e.stopPropagation(); return false; }
         }, true);
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('copy', e => e.preventDefault());
         document.addEventListener('cut', e => e.preventDefault());
         document.addEventListener('paste', e => e.preventDefault());
-        setInterval(function(){ try { (function(){}).constructor('debugger')(); } catch(e) {} }, 100);
-        setInterval(function(){
-            console.clear();
-            console.log = console.warn = console.error = console.info = console.debug = function(){};
-        }, 1500);
         if (window.top !== window.self) window.top.location.replace(window.self.location.href);
     }
 
     loadChannels();
 })();
 </script>
-
-<!-- All ad scripts have been removed as requested -->
 </body>
 </html>
